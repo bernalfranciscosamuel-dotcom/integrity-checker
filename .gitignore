@@ -1,0 +1,7 @@
+.venv/
+.venv
+_pycache_/
+*.pyc
+.pytest_cache/
+.vscode/
+baseline.json
