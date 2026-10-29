@@ -1,4 +1,5 @@
 import hashlib
+import json
 from pathlib import Path
 
 
@@ -10,3 +11,22 @@ def hash_file(path):
         for block in iter(lambda: f.read(65536), b""):
             sha256.update(block)
     return sha256.hexdigest()
+
+
+def hash_directory(directory):
+    """Devuelve un diccionario {ruta_relativa: hash} con todos los archivos de una carpeta."""
+    directory = Path(directory)
+    hashes = {}
+    for path in sorted(directory.rglob("*")):
+        if path.is_file():
+            relative = path.relative_to(directory).as_posix()
+            hashes[relative] = hash_file(path)
+    return hashes
+
+
+def save_baseline(directory, output="baseline.json"):
+    """Guarda la línea base (los hashes actuales) en un archivo JSON."""
+    hashes = hash_directory(directory)
+    with open(output, "w", encoding="utf-8") as f:
+        json.dump(hashes, f, indent=2, sort_keys=True)
+    return hashes
