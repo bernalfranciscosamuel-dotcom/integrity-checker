@@ -30,3 +30,21 @@ def save_baseline(directory, output="baseline.json"):
     with open(output, "w", encoding="utf-8") as f:
         json.dump(hashes, f, indent=2, sort_keys=True)
     return hashes
+
+
+def compare_baseline(directory, baseline_path="baseline.json"):
+    """Compara la carpeta actual con la línea base y devuelve los cambios."""
+    with open(baseline_path, "r", encoding="utf-8") as f:
+        baseline = json.load(f)
+
+    current = hash_directory(directory)
+
+    removed = sorted(set(baseline) - set(current))
+    added = sorted(set(current) - set(baseline))
+    modified = sorted(
+        name
+        for name in (set(baseline) & set(current))
+        if baseline[name] != current[name]
+    )
+
+    return {"modified": modified, "removed": removed, "added": added}
